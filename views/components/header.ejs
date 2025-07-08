@@ -1,0 +1,13 @@
+<div class="bg-white w-full h-[70px] flex flex-row justify-between">
+    <div class="text-black font-bold text-xl flex items-center p-4">
+        <%= locals.header.title || 'No Title'%>
+    </div>
+    <div class="p-4 flex flex-row gap-4 items-center">
+        <div class="w-full flex flex-col gap-0 items-end">
+            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-sm w-fit">Administrator</span>
+            <p class="text-black font-bold text-sm"><%= header.name %></p>
+            <p class="text-gray-400 font-normal text-xs"><%= header.date %></p>
+        </div>
+        <img class="w-10 h-10 rounded-full" src="<%= account.photo_url %>" alt="Rounded avatar">
+    </div>  
+</div>

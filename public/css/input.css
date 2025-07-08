@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "preline/variants.css";
+
+@plugin "flyonui";
+@source "/cdn/flyonui/dist/index.js";
+/* @import "flyonui/src/vendor/apexcharts.css"; */
+/* @custom-variant dark (&:where(.dark, .dark *)); */
+
+

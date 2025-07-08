@@ -1,0 +1,89 @@
+<div class="w-full h-full flex flex-col relative rounded-lg mx-5 mt-4 hide-scrollbar">
+      <p class="text-sm font-bold mb-4 text-black">Machine Learning Model</p>
+      <div class="w-full flex flex-row h-full gap-4">
+        <div class="h-full w-[70%] bg-white rounded-2xl p-3 mt-2 text-black">
+            <div class="flex items-center p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50" role="alert">
+                <svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <span class="sr-only">Info</span>
+                <div>
+                    <span class="font-medium">Note: </span> To enable real-time object identification, please upload a ZIP file of your exported model.
+                </div>
+            </div>  
+
+            <!-- <div class="flex flex-row mb-4">
+                <a href="https://teachablemachine.withgoogle.com/train/image" target="_blank">
+                    <button type="button" class="flex flex-row items-center gap-2 py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">
+                        Teachable Machine
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-3 h-3 text-black" fill="currentColor">
+                            <path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/>
+                        </svg>
+                    </button>
+                </a>
+                
+            </div> -->
+            
+            <div id="drop-area"
+                    class="flex items-center justify-center flex-col gap-1 border-1 border-dashed border-gray-400 h-[200px] rounded-4xl hover:bg-gray-100 relative"
+                  >
+                    <!-- Hidden file input -->
+                    <input id="fileElemModel" type="file" accept=".zip" style="display:none" />
+
+                    <div class="bg-gray-200 flex flex-row items-center justify-center p-4 rounded-full w-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-10 h-10 text-gray-600" fill="currentColor">
+                        <path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"/>
+                      </svg>
+                    </div>
+                    
+                    <span class="flex flex-row text-sm font-medium text-black gap-2">
+                      <p>Drop your zip file here or</p>
+                      <p class="text-blue-500 font-semibold cursor-pointer" onclick="document.getElementById('fileElemModel').click()">Browse</p>
+                    </span>
+                    
+                    <p class="text-xs font-medium text-gray-500">Only upload files from Machine Learning model exports</p>
+            </div>
+            <div class="mt-4">
+                <p class="text-sm font-medium text-black">Active Model</p>
+                <p class="mt-1flex flex-row gap-2 items-center text-sm font-bold text-gray-400">Model: <span id="activeModelTXT" class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm border border-green-400"><%= config.active_model || 'None' %></span></p>
+                <p class="text-xs font-medium text-gray-400">Date Added : <%= allconfig.find(conf => conf.name === 'active_model')?.formatted_date %></p>
+
+                <div class="bg-gray-100 mt-3 flex flex-col gap-2 rounded-2xl p-3 h-full">
+                    <div class="p-4 text-sm text-yellow-800 rounded-lg bg-yellow-50" role="alert">
+                        <span class="font-medium">Note: </span> Class names must exactly match the product names listed in the Products tab.
+                    </div>
+                    <p class="text-sm font-medium text-black mt-2">Classes</p>
+                    <div class="mb-2 text-sm font-normal text-gray-500">
+                        <%= activemodelinfo?.class || '' %>
+                    </div>  
+                </div>
+            </div>
+        </div>
+        <div class="h-full w-[30%] bg-white rounded-lg p-4 mt-2 flex flex-col">
+            <p class="text-sm font-medium text-black mb-4">Uploaded Models</p>
+            <div class="flex flex-col">
+                <% uploadedmodels?.forEach(model => { %>
+                    <div class="bg-gray-100 rounded-2xl p-2 px-4 flex flex-row justify-between">
+                        <div class="flex flex-col">
+                            <p class="text-xs font-bold text-gray-400"># <%= model.id %></p>
+                            <p class="text-sm font-bold text-black"><%= model.original_name %></p>
+                            <p class="text-xs font-normal text-gray-400"><%= model.formatted_date %></p>           
+                        </div>
+                        <div class="flex flex-row gap-4">
+                            <p class="use-model-btn flex flex-row gap-2  items-center text-sm font-semibold text-green-600" data-id="<%= model.id %>">Use <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-3 h-3 text-green-600" fill="currentColor">
+                                    <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>
+                                </svg>
+                            </p>
+
+                            <p class="delete-model-btn flex flex-row gap-2  items-center text-sm font-semibold text-red-400" data-id="<%= model.id %>">Delete <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-3 h-3 text-red-400" fill="currentColor">
+                                <path d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                                </svg>
+                            </p>
+                        </div>
+                    </div>  
+                <% }) %>
+               
+            </div>
+        </div>
+      </div>
+</div>

@@ -1,0 +1,47 @@
+<div class="w-full h-full flex flex-col relative rounded-lg mx-5 mt-4 hide-scrollbar">
+      <div class="flex flex-row gap-2 items-center mb-4">
+        <p class="text-sm font-bold text-black">Machine Learning Model</p>
+        <span id="status" class="w-fit bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">STATUS</span>
+      </div>
+      <div class="flex flex-row gap-2 w-full h-full">
+        <div class="flex gap-2 bg-white rounded-2xl w-[70%] h-full flex-col relative">
+            <!-- Video section: take all available space -->
+            <div class="flex-1 w-full flex items-center justify-center">
+                <video 
+                    class="w-fit h-full object-contain rounded-2xl" 
+                    id="webcam" 
+                    autoplay 
+                    muted 
+                    playsinline
+                ></video>
+            </div>
+
+            <!-- Buttons section: auto height -->
+            <div class="absolute bottom-0 w-full p-2 flex gap-2 flex-row items-center justify-center mt-5">
+                <button id="enableCam" type="button" class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">Enable Webcam</button>
+                <button id="capture" type="button" class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">Capture</button>
+                <button id="saveData" type="button" class="hidden py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">Save</button>
+                <button id="savemodel" type="button" class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">Save Model</button>
+            </div>
+        </div>
+
+        <div class="flex flex-col bg-white rounded-2xl w-[30%] h-full p-4">
+            <p class="text-gray-400 font-semibold text-xs">
+                Product name
+            </p>
+            <p id="product_name" class="text-black font-bold text-sm">
+                Product Name Here
+            </p>
+
+            <p class="text-gray-400 font-semibold text-xs mt-5">
+                Collected Data
+            </p>
+            <div id="canvas_container" class="flex flex-row flex-wrap gap-x-1 gap-y-0 overflow-y-scroll h-full">
+                
+            </div>
+                
+
+            <button type="button" id="train" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Start Training</button>
+        </div>
+      </div>
+</div>

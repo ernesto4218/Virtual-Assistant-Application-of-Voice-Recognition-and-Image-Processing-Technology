@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/output.css" type="text/css" />
+    <title>Account</title>
+</head>
+<body class="bg-white w-full h-[100vh]">
+    <div class="flex flex-row h-[100vh]">
+        <%- include('components/navigation'); %>
+        <div class="flex flex-col w-full">
+            <%- include('components/header'); %>
+            <%- include('components/toasts'); %>
+
+            <!-- content -->
+             <div class="p-7 mt-5 ml-5 bg-[#ECF2F9] rounded-tl-3xl flex flex-col h-[100vh] overflow-y-scroll pb-[200px]">
+                <div class=" h-[100vh] flex flex-col pb-[100px]">
+                    <div class="bg-gray-50 border-1 border-gray-200 w-full h-fit rounded-lg">
+                        <div class="h-5 border-b-gray-200 border-b-1 p-4 my-4 flex items-center">
+                            <p class="text-black font-medium text-lg">Personal Information</p>
+                        </div>
+                        <div class="flex flex-row gap-2 justify-between">
+                            <div class="flex flex-col w-full">
+                                <div class="p-4 flex flex-row gap-4 m-3">
+                                    <img class="w-20 h-20 rounded-full" src="<%= account.photo_url %>" alt="Rounded avatar">
+                                    <div class="w-full flex flex-col gap-0">
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm w-fit">Administrator</span>
+                                        <p class="text-black font-bold text-lg"><%= account.first_name %> <%= account.last_name %></p>
+                                        <p class="text-gray-400 font-normal text-xs">Created : <%= account.date_added %></p>
+                                    </div>
+                                </div>  
+
+                                <div class="flex flex-row justify-between">
+                                    <form id="personalinfoform" class="w-full p-4 bg-gray-200/30 rounded-lg m-6 border-1 border-gray-300">
+                                        <p class="text-black font-medium text-md mb-6">Account Information</p>
+                                        <div class="flex flex-row gap-2">
+                                            <div class="w-full mb-6">
+                                                <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900">First name</label>
+                                                <input name="firstname" value="<%= account.first_name %>" type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="John" required />
+                                            </div>
+                                            <div class="w-full mb-6">
+                                                <label for="last_name" class="block mb-2 text-sm font-medium text-gray-900">Last name</label>
+                                                <input name="lastname" value="<%= account.last_name %>" type="text" id="last_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Doe" required />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="mb-6">
+                                                <label for="phone" class="block mb-2 text-sm font-medium text-gray-900">Phone number</label>
+                                                <input name="phone" value="<%= account.phone %>" type="tel" id="phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="123-45-678" required />
+                                            </div>
+                                            <div class="mb-6">
+                                                <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email address</label>
+                                                <input name="email" value="<%= account.email %>" type="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="john.doe@company.com" required />
+                                            </div> 
+                                        </div>
+                                        <div class="flex flex-row w-full justify-end">
+                                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[30%] px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save</button>
+                                        </div>
+                                    </form>
+
+                                    <form id="changePassForm" class="w-full p-4 bg-gray-200/30 rounded-lg m-6 border-1 border-gray-300"> 
+                                        <p class="text-black font-medium text-md mb-6">Change Account Password</p>
+
+                                        <div class="mb-6">
+                                            <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Old Password</label>
+                                            <input type="password" name="oldpass" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="•••••••••" required />
+                                        </div> 
+
+                                        <div class="mb-6">
+                                            <label for="password" class="block mb-2 text-sm font-medium text-gray-900">New Password</label>
+                                            <input type="password" name="new_password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="•••••••••" required />
+                                        </div> 
+                                        <div class="mb-6">
+                                            <label for="confirm_password" class="block mb-2 text-sm font-medium text-gray-900">Confirm New Password</label>
+                                            <input type="password" name="confirm_password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="•••••••••" required />
+                                        </div> 
+                                        <div class="flex flex-row w-full justify-end">
+                                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-fit px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Change Password</button>
+                                        </div>
+                                    </form>
+                                </div>
+                               
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+                
+        </div>
+    </div>
+
+    <script src="/js/account.js"></script>
+
+</body>
+</html>

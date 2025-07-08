@@ -1,0 +1,38 @@
+{
+  "name": "virtual-assistant",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "devcss": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/output.css --watch",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@google/genai": "^1.5.1",
+    "@google/generative-ai": "^0.24.1",
+    "@tailwindcss/cli": "^4.1.7",
+    "apexcharts": "^4.7.0",
+    "axios": "^1.9.0",
+    "busboy": "^1.6.0",
+    "cheerio": "^1.1.0",
+    "cookie-parser": "^1.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "flyonui": "^2.1.0",
+    "fs": "^0.0.1-security",
+    "lodash": "^4.17.21",
+    "mime": "^4.0.7",
+    "multer": "^2.0.0",
+    "mysql2": "^3.14.1",
+    "nodemon": "^3.1.10",
+    "path": "^0.12.7",
+    "preline": "^3.0.1",
+    "tailwindcss": "^4.1.7",
+    "unzipper": "^0.12.3",
+    "uuid": "^11.1.0"
+  },
+  "type": "module"
+}

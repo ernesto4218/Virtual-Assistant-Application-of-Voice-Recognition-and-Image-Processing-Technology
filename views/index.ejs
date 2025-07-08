@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/output.css" type="text/css" />
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+
+    <title>Virtual Assistant</title>
+    <style>
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                box-shadow:
+                0 0 10px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(0, 0, 0, 0.1);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.02);
+                box-shadow:
+                    0 0 15px rgba(0, 0, 0, 0.3),
+                    0 0 25px rgba(0, 0, 0, 0.2),
+                    0 0 35px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes backgroundBlur {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .animate-backgroundBlur {
+            background-size: 300% 300%;
+            animation: backgroundBlur 15s ease infinite;
+        }
+
+        .shadow-glow {
+            box-shadow:
+                0 0 10px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(0, 0, 0, 0.1);
+            }
+    </style>
+</head>
+
+<body class="bg-white h-[100vh] relative overflow-hidden">
+
+    <div class="w-full absolute flex justify-end p-4 z-10">
+        <a href="/admin/home">
+            <button type="button" class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">
+                Admin Panel
+            </button>
+        </a>
+    </div>  
+
+    <div class="w-full h-full relative flex items-center justify-center">
+
+        <!-- Subtle animated background layer -->
+        <div class="absolute inset-0 bg-gradient-to-br from-white/5 via-white/10 to-white/5 animate-backgroundBlur z-0"></div>
+
+        <!-- Centered content -->
+        <div class="flex flex-col gap-2 items-center z-10">
+            <div id="blob" class="w-70 h-70 bg-white rounded-full animate-float shadow-glow mt-20 flex items-center justify-center">
+                    <img src="/img/sound-waves.png" class="w-20 h-20">
+            </div>
+            <!-- <div id="blob" class="shadow-glow w-70 h-70 bg-white rounded-full animate-float shadow-glow mt-20 flex items-center justify-center z-10 relative"></div> -->
+            <div id="listening_indicator" class="hidden flex-row gap-2  pt-20 items-center justify-center absolute bottom-40 left-1/2 transform -translate-x-1/2">
+                <i class="fi fi-sr-waveform text-emerald-600 text-sm"></i>
+                <p class="text-emerald-600 text-sm">Listening</p>
+            </div>
+        </div>
+
+        <div id="Interim" class="absolute bottom-30 left-1/2 transform -translate-x-1/2 text-gray-400 text-[17px] font-medium opacity-50 flex flex-row justify-center items-center">
+            
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-row justify-center items-center max-w-[60vw]">
+            <span id="caption" class="text-black text-[17px] font-medium opacity-50 break-words max-w-full inline-block"></span>
+        </div>
+
+        <!-- camera -->
+        <div id="cameracontainer" class="bg-black/90 fixed w-full h-full z-30 flex-row items-center justify-center">
+            <div class="bg-white rounded-4xl w-[70%] h-[70%] relative overflow-hidden flex items-center justify-center">
+                <video id="cameraFeed" autoplay playsinline class="w-full h-full object-cover rounded-4xl"></video>
+
+                <!-- Black shadow at the bottom -->
+                <div class="absolute flex items-center justify-center bottom-0 left-0 w-full h-20 bg-gradient-to-t from-black/80 to-transparent pointer-events-none rounded-b-4xl">
+                    <p class="text-white font-medium text-[15px] pt-5">Please place the object in view of the camera and ensure it’s clearly visible.</p>
+                </div>
+                <div id="captureTimercontainer" class="hidden bg-black/20 absolute items-center justify-center left-0 w-full h-full">
+                    <p id="timerText" class="text-white font-medium text-[200px]">0</p>
+                </div>
+            </div>
+        </div>
+        <div id="productInfoContainer" class="hidden bg-black/90 fixed w-full h-full z-30 flex-row items-center justify-center">
+            <div class="bg-white rounded-4xl w-fit h-[70%] relative overflow-hidden flex flex-col justify-start p-4">
+                <div class="flex flex-row items-start justify-start w-fit h-fit">
+                    <img id="capturedImg" class="h-auto max-w-full rounded-4xl" src="https://placehold.co/600x400" alt="image description">
+                </div>
+                <div class="w-[30%]">
+
+                </div>
+            </div>
+        </div>
+
+        <!-- product list -->
+        <div class="product-list-container hidden fixed top-0 left-5 w-fit h-screen bg-none items-center justify-center">
+            <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+                <a href="#">
+                    <img
+                        src="https://placehold.co/600x400"
+                        class="product-image block w-[600px] h-[400px] object-cover rounded-lg"
+                        alt="..."
+                    />
+                </a>
+                <div class="p-5">
+                <a href="#" class="flex flex-row gap-2 items-center">
+                    <h5 class="product-name mb-2 text-2xl font-bold tracking-tight text-gray-900">
+                    Product Name
+                    </h5>
+
+                    <span class="product-price bg-green-100 text-green-800 text-xl font-medium px-2.5 py-0.5 rounded-sm">Price</span>
+
+                </a>
+                <p class="product-description mb-3 font-normal text-gray-700">
+                    product-description
+                </p>
+                <a
+                    href="#"
+                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                >
+                    Know more
+                    <svg
+                    class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 10"
+                    >
+                    <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M1 5h12m0 0L9 1m4 4L9 9"
+                    />
+                    </svg>
+                </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="config-data"
+        data-allconfig="<%= JSON.stringify(allconfig || {}) %>">
+    </div>
+    <script src="/js/assistant.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <script>
+        const carousel = document.getElementById('controls-carousel');
+        const items = carousel.querySelectorAll('[data-carousel-item]');
+        let currentIndex = 0;
+        const totalItems = items.length;
+
+        function showSlide(index) {
+        items.forEach((item, i) => {
+            if (i === index) {
+            item.classList.remove('hidden');
+            item.setAttribute('data-carousel-item', 'active');
+            } else {
+            item.classList.add('hidden');
+            item.removeAttribute('data-carousel-item');
+            }
+        });
+        }
+
+        function nextSlide() {
+        currentIndex = (currentIndex + 1) % totalItems;
+        showSlide(currentIndex);
+        }
+
+        // Initialize the first slide visible
+        showSlide(currentIndex);
+
+        // Auto slide every 3 seconds (adjust as needed)
+        setInterval(nextSlide, 1000);
+    </script>
+</body>
+</html>

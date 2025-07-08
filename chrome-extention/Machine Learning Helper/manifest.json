@@ -1,0 +1,41 @@
+{
+    "name": "Machine Learning Helper",
+    "description": "ignore x-frame-options",
+    "version": "1",
+    "manifest_version": 3,
+
+    "icons": {
+        "16": "robot-solid.svg"
+    },
+
+    "background": {
+        "service_worker": "background.js"
+    },
+
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "permissions": [
+        "declarativeNetRequest",
+        "declarativeNetRequestWithHostAccess"
+    ],
+
+    "content_scripts": [
+        {
+        "matches": ["https://teachablemachine.withgoogle.com/*"],
+        "all_frames": true,
+        "js": ["content-script.js"]
+        }
+    ],
+
+    "declarative_net_request": {
+        "rule_resources": [{
+            "id": "ruleset_1",
+            "enabled": true,
+            "path": "rules.json"
+        }]
+    }
+
+
+
+}

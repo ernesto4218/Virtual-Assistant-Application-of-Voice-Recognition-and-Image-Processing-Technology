@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/output.css" type="text/css" />
+    <title>Machine Learning</title>
+</head>
+<body class="bg-white w-full h-screen p-0 m-0 flex flex-row">
+        <%- include('components/navigation'); %>
+        <div class="flex flex-col w-full h-full">
+            <%- include('components/header'); %>
+            <%- include('components/toasts'); %>
+            <%- include('components/modal'); %>
+
+            <!-- content -->
+            <div class="mt-5 ml-5 bg-[#ECF2F9] rounded-tl-3xl h-screen overflow-hidden relative">
+                <iframe 
+                    id="tm"
+                    src="https://teachablemachine.withgoogle.com/train/image/105GJfoHHNS1dnF5KpdQLHukEXSvNjyxv" 
+                    title="Machine Learning"
+                    class="absolute top-0 left-0 w-full h-full border-none"
+                    allow="camera; microphone">
+                </iframe>
+
+                <!-- Overlay div -->
+                <div 
+                    class="flex flex-row items-center gap-2 font-bold text-xl absolute -top-1 -left-1 text-black bg-white bg-opacity-80 px-[90px] py-5 rounded-xl z-10 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-5 h-5 text-black" fill="currentColor">
+                        <path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>
+                    Learning Model
+                </div>
+            </div>
+
+        </div>
+    
+
+    <!-- Import TensorFlow.js library -->
+    <script src="/js/imageprocessing.js"></script>
+</body>
+</html>

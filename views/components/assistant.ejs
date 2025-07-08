@@ -1,0 +1,86 @@
+<div class="flex flex-row gap-2">
+    <div class="w-[50%] flex flex-col gap-2 border-r-1 border-gray-200 p-5">
+        <div class="hidden">
+            <label for="api_key" class="block mb-2 text-sm font-medium text-gray-900">API Key</label>
+            <input
+            type="text"
+            id="api_key"
+            name="api_key"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            placeholder="API Key"
+            value="<%= config.api_key || '' %>"
+            required
+            />                        
+        </div>
+        <div class="mt-5">
+            <label for="message" class="block mb-2 text-sm font-medium text-gray-900">System Instructions</label>
+            <textarea
+            id="instructions"
+            name="instructions"
+            rows="8"
+            class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="AI Instructions here..."
+            ><%= config.instructions || '' %></textarea>                        
+        </div>
+
+        <div class="flex-col gap-2 mt-5 hidden">
+            <p class="block mb-2 text-sm font-medium text-gray-900">Image Recognition</p>
+            <div class="flex flex-col gap-4">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input 
+                        type="checkbox" 
+                        class="sr-only peer recognition-toggle"
+                        value="gemini"
+                        <% if (allconfig.find(conf => conf.name === 'recognition')?.value === 'gemini') { %>checked<% } %>
+                    >
+                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300 peer-checked:bg-green-500 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    <span class="ms-3 text-sm font-medium text-gray-900">AI Vision (Cloud)</span>
+                </label>
+
+
+                <label class="inline-flex items-center cursor-pointer">
+                    <input 
+                        type="checkbox" 
+                        class="sr-only peer recognition-toggle"
+                        value="ml"
+                        <% if (allconfig.find(conf => conf.name === 'recognition')?.value === 'ml') { %>checked<% } %>
+                    >
+                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300 peer-checked:bg-green-500 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    <span class="ms-3 text-sm font-medium text-gray-900">Machine Learning Model</span>
+                </label>
+            </div>
+            
+            <div class="flex items-center p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50" role="alert">
+                <svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <span class="sr-only">Info</span>
+                <div>
+                    <span class="font-medium">Note: </span> To enable real-time object identification, Make sure you have selected a training model in the "Machine Learning" tab.
+                </div>
+            </div>  
+        </div>
+
+        <div class="w-full flex flex-row justify-end">
+            <button type="button" id="saveConfigBTN" class="flex flex-row gap-3 text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-r h-4" fill="currentColor"><path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-242.7c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32L64 32zm0 96c0-17.7 14.3-32 32-32l192 0c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L96 224c-17.7 0-32-14.3-32-32l0-64zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
+                Save</button>
+        </div>
+
+    </div>
+    <div class="w-[50%] overflow-y-scroll">
+        <div class="mt-5 flex flex-row gap-2">
+            <div class="w-full">
+                <form class="w-full" onsubmit="return false;">
+                    <label for="restrictions" class="block mb-2 text-sm font-medium text-gray-900">Select a restriction</label>
+                    <select id="restrictions" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option selected disabled>Choose</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <span for="restrict_selected" class="block mb-2 text-sm font-medium text-gray-900 mt-5">Restrictions</span>
+        <div class="flex flex-row items-center justify-start gap-2 overflow-hidden flex-wrap pb-[100px]" id="badge-container"></div>
+        </div>
+</div>

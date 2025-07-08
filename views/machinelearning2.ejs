@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/output.css" type="text/css" />
+    <title>Machine Learning</title>
+</head>
+<body class="bg-white w-screen h-screen p-0 m-0 flex flex-row">
+        <%- include('components/navigation'); %>
+        <div class="flex flex-col w-screen h-full">
+            <%- include('components/header'); %>
+            <%- include('components/toasts'); %>
+            <%- include('components/modal'); %>
+
+            <!-- content -->
+            <div class="mt-5 p-5 bg-[#ECF2F9] rounded-tl-3xl h-screen overflow-hidden flex flex-row w-ful gap-2">
+                <div class="flex flex-col w-full rounded-2xl h-full p-4">
+                    <p class="text-black font-semibold text-sm">Products</p>
+                    <div class="flex flex-col">
+                        <% products.forEach(product => { %>
+                            <div class="mt-3 bg-white rounded-3xl flex flex-col p-2 px-4 gap-2">
+                            <div class="w-full flex flex-col gap-2">
+                                <div class="flex flex-row gap-2 items-center">
+                                <span class="bg-gray-700 text-gray-300 text-xs font-medium px-[7px] py-[3px] rounded-sm">
+                                    Name : <%= product.name %>
+                                </span>
+                                </div>
+                            </div>
+
+                            <div class="w-fit flex flex-row items-center overflow-x-scroll gap-2">
+                                <% 
+                                let images = product.image_path.split(',').map(img => img.trim()); 
+                                %>
+                                <% images.forEach(imgPath => { %>
+                                <img class="w-[100px] rounded-xl" src="/<%= imgPath %>" alt="Image of <%= product.name %>">
+                                <% }) %>
+                            </div>
+                            </div> 
+                        <% }) %>
+                        </div>
+
+                </div>
+                <div class="flex flex-col w-full bg-white rounded-2xl h-full p-4">
+                    <p class="text-black font-semibold text-sm">Machine Learning</p>
+                    <button id="train" type="button" class="w-fit text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">Start</button>
+                </div>
+            </div>
+
+
+
+        </div>
+    
+    <div id="config-data"
+        data-products="<%= JSON.stringify(products || {}) %>">
+    </div>
+    <!-- Import TensorFlow.js library -->
+    <!-- <script src="/js/imageprocessing.js"></script> -->
+    <script src="/js/tf.min.js" type="text/javascript"></script>
+    <script type="module" src="/js/mlscript.js"></script>
+</body>
+</html>
