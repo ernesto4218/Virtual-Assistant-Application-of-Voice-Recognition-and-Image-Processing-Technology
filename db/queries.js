@@ -6,11 +6,11 @@ export const GET_ALL_CONFIGS = 'SELECT * FROM system_config';
 
 // products
 export const GET_PRODUCT_BY_NAME = 'SELECT * FROM products WHERE name = ?';
-export const INSERT_PRODUCT = 'INSERT INTO products (name, description, usage_info, category, price) VALUES (?, ?, ?, ?, ?)';
-export const UPDATE_PRODUCT = 'UPDATE products SET name = ?, description = ?, usage_info = ?, category = ?, price = ? WHERE id = ?';
+export const INSERT_PRODUCT = 'INSERT INTO products (name, description, usage_info, category, price, stocks_val) VALUES (?, ?, ?, ?, ?, ?)';
+export const UPDATE_PRODUCT = 'UPDATE products SET name = ?, description = ?, usage_info = ?, category = ?, price = ?, stocks_val = ? WHERE id = ?';
 export const DELETE_PRODUCT = 'DELETE FROM products WHERE id = ?';
 export const GET_ALL_PRODUCT = `
-  SELECT products.id, products.name, products.description, products.usage_info, products.category, products.price, product_images.image_path
+  SELECT products.id, products.name, products.description, products.usage_info, products.category, products.price, product_images.image_path, products.stocks_val
   FROM products
   LEFT JOIN product_images ON products.id = product_images.product_id
 `;
@@ -33,7 +33,7 @@ export const GET_ALL_PRODUCT_IMAGE = `
 `;
 
 // ai
-export const GET_PRODUCT_BY = 'SELECT name, description, category, price FROM products';
+export const GET_PRODUCT_BY = 'SELECT name, description, category, price, stocks_val FROM products';
 export const INSERT_QUERY = 'INSERT INTO customer_queries (question, response, matched_item_name, matched_item_description, price) VALUES (?, ?, ?, ?, ?)';
 export const INSERT_QUERY_IMAGE = 'INSERT INTO image_processing (image_path, matched_item_name, matched_item_description, price, question) VALUES (?, ?, ?, ?, ?)';
 

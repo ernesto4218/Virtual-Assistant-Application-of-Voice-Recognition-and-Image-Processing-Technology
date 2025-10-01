@@ -66,11 +66,14 @@ addproductForm.addEventListener('submit', function(event) {
     formData.append('usage_info', document.getElementById('usage_info').value.trim());
     formData.append('category', document.getElementById('category').value);
     formData.append('price', document.getElementById('price').value);
+    formData.append('stocks_val', document.getElementById('stocks_val').value);
     formData.append('id', document.getElementById('id').value.trim());
 
     console.log(formData.get('id'));
     const files = document.getElementById('productImage').files;
-    if (files.length !== 10) {
+    console.log(files.length);
+
+    if (files.length < 10 && !document.getElementById('id').value) {
         showToast('error', 'You must upload exactly 10 images.');
         return;
     }
@@ -100,6 +103,19 @@ addproductForm.addEventListener('submit', function(event) {
         allproducts = data.allproducts;
         console.log(allproducts);
         populateProductTable(allproducts, 1);
+
+        addProduct_Formcontainer.classList.remove('flex');
+        addProduct_Formcontainer.classList.add('hidden');
+
+        AddProductNavBTN.classList.remove('bg-blue-500', 'text-white');
+        AddProductNavBTN.classList.add('bg-white', 'text-black');
+
+        addproductForm.querySelector('#name').value = '';
+        addproductForm.querySelector('#category').value = '';
+        addproductForm.querySelector('#price').value = '';
+        addproductForm.querySelector('#description').value = '';
+        addproductForm.querySelector('#id').value = '';
+        addproductForm.querySelector('button[type="submit"] .addproducttext').textContent = 'Add Product';
     })
     .catch(error => {
         console.error('Error:', error);
@@ -148,6 +164,7 @@ function populateProductTable(data = allproducts, page = 1) {
                 <td class="px-6 py-4 w-[150px] overflow-x-auto whitespace-nowrap hide-scrollbar">${product.name}</td>
                 <td class="px-6 py-4 w-[150px] overflow-x-auto whitespace-nowrap hide-scrollbar">${product.description}</td>
                 <td class="px-6 py-4 w-[150px] overflow-x-auto whitespace-nowrap hide-scrollbar">${product.usage_info || 'none'}</td>
+                <td class="px-6 py-4 w-[100px] overflow-x-auto whitespace-nowrap hide-scrollbar">${product.stocks_val}</td>
                 <td class="flex flex-row gap-1 px-6 py-4 w-[150px] overflow-x-auto whitespace-nowrap hide-scrollbar">${imageHTML}</td>
                 <td class="px-6 py-4 w-[150px] overflow-x-auto whitespace-nowrap hide-scrollbar">${product.category}</td>
                 <td class="px-6 py-4 w-[100px] overflow-x-auto whitespace-nowrap hide-scrollbar">₱${formattedPrice}</td>
@@ -191,6 +208,8 @@ productsTable.addEventListener('click', (event) => {
         addproductForm.querySelector('#category').value = productData.category;
         addproductForm.querySelector('#price').value = productData.price;
         addproductForm.querySelector('#description').value = productData.description;
+        addproductForm.querySelector('#usage_info').value = productData.usage_info;
+        addproductForm.querySelector('#stocks_val').value = productData.stocks_val;
         addproductForm.querySelector('#id').value = productData.id;
         addproductForm.querySelector('button[type="submit"] .addproducttext').textContent = 'Save';
     }
@@ -305,6 +324,7 @@ const captureBtn = document.getElementById('captureBtn');
 const doneBtn = document.getElementById('doneBtn');
 const video = document.getElementById('camera');
 const preview = document.getElementById('preview');
+const imagecounttxt = document.getElementById('imagecounttxt');
 
 let stream;
 let capturedImages = [];
@@ -315,18 +335,22 @@ captureBtn.onclick = async () => {
       stream = await navigator.mediaDevices.getUserMedia({ video: true });
       video.srcObject = stream;
       video.style.display = 'block';
-      doneBtn.style.display = 'inline-block';
+      doneBtn.style.display = 'none';
       captureBtn.textContent = 'Take Photo';
     } catch (err) {
       alert('Camera access denied or not available.');
       return;
     }
   } else {
+    doneBtn.style.display = 'none';
     // Take photo
     if (capturedImages.length >= 10) {
-      alert('You can capture a maximum of 5 images.');
+        doneBtn.style.display = 'inline-block';
+        imagecounttxt.textContent = capturedImages.length + "/10 images";
       return;
     }
+
+    imagecounttxt.textContent = capturedImages.length + "/10 images";
     
     // Create canvas to capture frame
     const canvas = document.createElement('canvas');

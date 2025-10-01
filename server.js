@@ -16,7 +16,7 @@ import { getAllConfigs,
 } from './db/services.js';
 
 import cookieParser from 'cookie-parser';
-import axios from "axios";
+import axios, { all } from "axios";
 import * as cheerio from "cheerio";
 
 const app = express();
@@ -195,8 +195,8 @@ app.get('/admin/sysconfig', async (req, res) => {
   // console.log('Uploaded files:', uploadedfiles);
   // console.log('Matching active model:', matchingModel);
 
-  console.log(allconfig);
-  
+  allproducts.sort((a, b) => b.id - a.id);
+  console.log(allproducts);
   const header = {
     date: getFormattedTime(),
     name: `${getGreeting()}, ${formattedAuth.first_name}`,
@@ -213,6 +213,7 @@ app.get('/admin/sysconfig', async (req, res) => {
     uploadedmodels: uploadedfiles,
     activemodelinfo: matchingModel || null, // pass it to the view
   });
+  
 });
 
 app.get('/admin/imageprocessing', async (req, res) => {

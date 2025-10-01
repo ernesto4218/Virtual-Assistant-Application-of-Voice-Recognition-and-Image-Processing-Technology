@@ -34,13 +34,13 @@ export async function getProduct(name) {
   return rows[0];
 }
 
-export async function insertProduct(name, description, usage_info, category, price) {
-  const [result] = await db.execute(queries.INSERT_PRODUCT, [name, description, usage_info, category, price]);
+export async function insertProduct(name, description, usage_info, category, price, stocks_val) {
+  const [result] = await db.execute(queries.INSERT_PRODUCT, [name, description, usage_info, category, price, stocks_val]);
   return result.insertId;
 }
 
-export async function updateProduct(name, description, usage_info, category, price, id) {
-  const [result] = await db.execute(queries.UPDATE_PRODUCT, [name, description, usage_info, category, price, id]);
+export async function updateProduct(name, description, usage_info, category, price, stocks_val, id) {
+  const [result] = await db.execute(queries.UPDATE_PRODUCT, [name, description, usage_info, category, price, stocks_val, id]);
   return result.affectedRows;
 }
 

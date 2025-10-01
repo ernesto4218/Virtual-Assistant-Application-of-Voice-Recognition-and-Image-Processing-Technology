@@ -439,11 +439,13 @@ router.post('/addProduct', upload.array('productImages', 10), async (req, res) =
   const usage_info = req.body.usage_info;
   const category = req.body.category;
   const price = req.body.price;
+  const stocks_val = req.body.stocks_val;
+
 
   console.log(req.body);
 
   if (id){
-    const update = await updateProduct(name, description, usage_info, category, price, id);
+    const update = await updateProduct(name, description, usage_info, category, price, stocks_val, id);
     if (!update) return res.status(500).json({ error: 'Product update failed' });
 
     if (filePaths){
@@ -455,7 +457,7 @@ router.post('/addProduct', upload.array('productImages', 10), async (req, res) =
     res.status(200).json({ message: 'Update successful', allproducts: allproducts});
 
   } else {
-    const insert = await insertProduct(name, description, usage_info, category, price);
+    const insert = await insertProduct(name, description, usage_info, category, price, stocks_val);
     if (!insert) return res.status(500).json({ error: 'Product insert failed' });
 
     const insertImage = await insertProductImage(insert, filePaths);
