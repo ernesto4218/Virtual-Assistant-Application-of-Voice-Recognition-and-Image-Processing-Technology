@@ -59,15 +59,24 @@ router.post('/ask', async (req, res) => {
 
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
-      contents: question,
-      config: {
-        systemInstruction: `${instructions}. Use this only items avaialable with categoreis and prices as philippine pesos ₱00: ${productsString}. Topics you are not allowed to talk about ${restrictions}\n\n The customer question : ${question}?`,
+      systemInstruction: {
+        role: "system",
+        parts: [{
+          text: `${instructions}. Use only items available with categories and prices in Philippine pesos ₱00: ${productsString}. Topics you are not allowed to talk about: ${restrictions}.`
+        }]
       },
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `The customer question: ${question}` }]
+        }
+      ],
       generationConfig: {
         maxOutputTokens: 100,
         temperature: 0.1,
       },
     });
+
 
     const text = response?.candidates?.[0]?.content?.parts?.[0]?.text || 'Failed to create response.';
 
@@ -89,8 +98,44 @@ router.post('/ask', async (req, res) => {
   }
 });
 
-router.post('/mlverify', async (req, res) => {
-  
+
+router.post('/record_question', async (req, res) => {
+  try {
+    const { response, question } = req.body;
+    const products = await getAllProductsBy();
+
+    // Simulate response generation
+    const text = response || 'Failed to create response.';
+
+    const matchedProduct = products.find(product =>
+      text.toLowerCase().includes(product.name.toLowerCase())
+    );
+
+    let record;
+    if (matchedProduct) {
+      record = await insertQuery(question, response, matchedProduct.name, matchedProduct.description, matchedProduct.price);
+    } else {
+      record = await insertQuery(question, response, null, null, null);
+    }
+
+    // Send back the result
+    res.json({ success: true, record, responseText: text });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
+router.post('/getconfig', async (req, res) => {
+  const instructions = (await getConfig('instructions')).value;
+  const restrictions = (await getConfig('selected_restrictions')).value;
+  const products = await getAllProductsBy();
+  const productsString = JSON.stringify(products);
+
+  res.json({success: true, instructions: instructions, restrictions: restrictions, productsString: productsString });
+
 });
 
 router.post('/saveconfig', async (req, res) => {
