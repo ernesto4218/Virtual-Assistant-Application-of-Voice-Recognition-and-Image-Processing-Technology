@@ -20,7 +20,7 @@ import axios, { all } from "axios";
 import * as cheerio from "cheerio";
 
 const app = express();
-const port = 3000;
+const port = 3002;
 
 // __dirname workaround for ES Modules
 const __filename = fileURLToPath(import.meta.url);

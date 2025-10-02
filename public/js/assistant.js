@@ -82,119 +82,119 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
 
                     const start = Date.now();
 
-                    try {
-                      const response = await fetch('/api/getconfig', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({}) // if your endpoint doesn't need any payload, you can send an empty object
-                      });
-
-                      if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                      }
-
-                      const data = await response.json();
-                      console.log('Config fetched:', data);
-
-                      const GEMINI_API_KEY = "AIzaSyDv7QyjafeOqA9wlSX1GtRkh9rkBEQyVTM";
-                      const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-
-                      const payload = {
-                        systemInstruction: {
-                          role: "system",
-                          parts: [{
-                            text: `${data.instructions}. Use only items available with categories and prices in Philippine pesos ₱00: ${data.productsString}. Topics you are not allowed to talk about: ${data.restrictions}.`
-                          }]
-                        },
-                        contents: [
-                          {
-                            role: "user",
-                            parts: [{ text: `The customer question: ${transcriptSegment}` }]
-                          }
-                        ],
-                        // optional: generation config
-                        generationConfig: {
-                          maxOutputTokens: 200,
-                          temperature: 0.2
-                        }
-                      };
-
-                      try {
-                        const r = await fetch(GEMINI_URL, {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            "x-goog-api-key": GEMINI_API_KEY
-                          },
-                          body: JSON.stringify(payload)
-                        });
-
-                        if (!r.ok) {
-                          const errBody = await r.text();
-                          outEl.textContent = `HTTP ${r.status} — ${r.statusText}\n\n${errBody}`;
-                          return;
-                        }
-
-                        const data = await r.json();
-                        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? JSON.stringify(data, null, 2);
-
-                        console.log(data);
-                        console.log(text);
-
-                        console.log("Response in", Date.now() - start, "ms:", data);
-                        speakWithVoice(text, "Google UK English Female");
-                        typeCaption(text);     
-                        isWaitingForResponse = false;
-
-                        try {
-                          const response = await fetch('/api/record_question', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({response: text, question: transcriptSegment})
-                          });
-
-                          if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                          }
-
-                          const data = await response.json();
-                          console.log('Config fetched:', data);
-                        } catch (error) {
-                          console.error('Error fetching config:', error);
-                        }
-                        
-                      } catch (err) {
-                        console.log(err);
-                        console.log(err.message);
-                        // outEl.textContent = "Network or CORS error:\n\n" + err.message;
-                      }                      
-                    } catch (error) {
-                      console.error('Error fetching config:', error);
-                    }
-                    
-                    
-                    // fetch('/api/ask', {
+                    // try {
+                    //   const response = await fetch('/api/getconfig', {
                     //     method: 'POST',
                     //     headers: {
-                    //         'Content-Type': 'application/json'
+                    //       'Content-Type': 'application/json'
                     //     },
-                    //     body: JSON.stringify({ question: transcriptSegment })
-                    // })
-                    // .then(res => res.json())
-                    // .then(data => {
+                    //     body: JSON.stringify({}) // if your endpoint doesn't need any payload, you can send an empty object
+                    //   });
+
+                    //   if (!response.ok) {
+                    //     throw new Error(`HTTP error! status: ${response.status}`);
+                    //   }
+
+                    //   const data = await response.json();
+                    //   console.log('Config fetched:', data);
+
+                    //   const GEMINI_API_KEY = "AIzaSyDv7QyjafeOqA9wlSX1GtRkh9rkBEQyVTM";
+                    //   const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
+                    //   const payload = {
+                    //     systemInstruction: {
+                    //       role: "system",
+                    //       parts: [{
+                    //         text: `${data.instructions}. Use only items available with categories and prices in Philippine pesos ₱00: ${data.productsString}. Topics you are not allowed to talk about: ${data.restrictions}.`
+                    //       }]
+                    //     },
+                    //     contents: [
+                    //       {
+                    //         role: "user",
+                    //         parts: [{ text: `The customer question: ${transcriptSegment}` }]
+                    //       }
+                    //     ],
+                    //     // optional: generation config
+                    //     generationConfig: {
+                    //       maxOutputTokens: 200,
+                    //       temperature: 0.2
+                    //     }
+                    //   };
+
+                    //   try {
+                    //     const r = await fetch(GEMINI_URL, {
+                    //       method: "POST",
+                    //       headers: {
+                    //         "Content-Type": "application/json",
+                    //         "x-goog-api-key": GEMINI_API_KEY
+                    //       },
+                    //       body: JSON.stringify(payload)
+                    //     });
+
+                    //     if (!r.ok) {
+                    //       const errBody = await r.text();
+                    //       outEl.textContent = `HTTP ${r.status} — ${r.statusText}\n\n${errBody}`;
+                    //       return;
+                    //     }
+
+                    //     const data = await r.json();
+                    //     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? JSON.stringify(data, null, 2);
+
+                    //     console.log(data);
+                    //     console.log(text);
+
                     //     console.log("Response in", Date.now() - start, "ms:", data);
-                    //     speakWithVoice(data.message, "Google UK English Female");
-                    //     typeCaption(data.message);     
+                    //     speakWithVoice(text, "Google UK English Female");
+                    //     typeCaption(text);     
                     //     isWaitingForResponse = false;
-                    // })
-                    // .catch(err => {
-                    //     console.error('Error:', err);
-                    //     isWaitingForResponse = false;
-                    // });
+
+                    //     try {
+                    //       const response = await fetch('/api/record_question', {
+                    //         method: 'POST',
+                    //         headers: {
+                    //           'Content-Type': 'application/json'
+                    //         },
+                    //         body: JSON.stringify({response: text, question: transcriptSegment})
+                    //       });
+
+                    //       if (!response.ok) {
+                    //         throw new Error(`HTTP error! status: ${response.status}`);
+                    //       }
+
+                    //       const data = await response.json();
+                    //       console.log('Config fetched:', data);
+                    //     } catch (error) {
+                    //       console.error('Error fetching config:', error);
+                    //     }
+                        
+                    //   } catch (err) {
+                    //     console.log(err);
+                    //     console.log(err.message);
+                    //     // outEl.textContent = "Network or CORS error:\n\n" + err.message;
+                    //   }                      
+                    // } catch (error) {
+                    //   console.error('Error fetching config:', error);
+                    // }
+                    
+                    
+                    fetch('/api/ask', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ question: transcriptSegment })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log("Response in", Date.now() - start, "ms:", data);
+                        speakWithVoice(data.message, "Google UK English Female");
+                        typeCaption(data.message);     
+                        isWaitingForResponse = false;
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        isWaitingForResponse = false;
+                    });
                 }
             } else {
                 interimTranscript += transcriptSegment + ' ';
@@ -532,71 +532,31 @@ async function captureCamera() {
 
   try {
     if (method === 'gemini'){
-      const GEMINI_API_KEY = "AIzaSyDv7QyjafeOqA9wlSX1GtRkh9rkBEQyVTM";
-      const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-
-      const payload = {
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: question }]
-          }
-        ],
-        // optional: generation config
-        generationConfig: {
-          maxOutputTokens: 200,
-          temperature: 0.2
-        }
-      };
-
-      try {
-        const r = await fetch(GEMINI_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": GEMINI_API_KEY
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!r.ok) {
-          const errBody = await r.text();
-          outEl.textContent = `HTTP ${r.status} — ${r.statusText}\n\n${errBody}`;
-          return;
-        }
-
-        const data = await r.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? JSON.stringify(data, null, 2);
-
-        console.log(data);
-        console.log(text);
-
-      } catch (err) {
-        outEl.textContent = "Network or CORS error:\n\n" + err.message;
-      }
       
-      // const res = await fetch('/api/processimage', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify({ img: imageDataURL, question: user_question })
-      // });
+      // const result = await analyzeImage(imageDataURL, user_question);
+      // console.log(result);
+      const res = await fetch('/api/processimage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ img: imageDataURL, question: user_question })
+      });
 
-      // const data = await res.json();
+      const data = await res.json();
 
-      // console.log(data);
+      console.log(data);
 
-      // infoSound.play();
-      // await speakWithVoice(data.message, "Google UK English Female");
-      // cameramode = false;
-      // typeCaption(data.message);
-      // resumeRecognition();
+      infoSound.play();
+      await speakWithVoice(data.message, "Google UK English Female");
+      cameramode = false;
+      typeCaption(data.message);
+      resumeRecognition();
 
-      // if (data.item){
-      //   console.log(data.item);
-      //   showproduct(data.item);
-      // }
+      if (data.item){
+        console.log(data.item);
+        showproduct(data.item);
+      }
     } else if (method === 'ml'){  
       const res = await fetch('http://localhost:8000/predict', {
         method: 'POST',
@@ -769,6 +729,77 @@ async function initCamera() {
   } catch (error) {
     console.error('❌ Error accessing camera:', error);
     alert('Unable to access the camera. Please check permissions.');
+  }
+}
+
+async function analyzeImage(imageDataURL, userQuestion) {
+  const question = userQuestion || "What is in this image?";
+
+  try {
+    // Fetch config from backend
+    const configResp = await fetch("/api/getconfig", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) });
+    const configData = await configResp.json();
+
+    const prompt = `
+      You are tasked with identifying a single object in an image.
+      ...
+      General Merchandise Items:
+      ${configData.productsString}
+      ---
+      Topics you are not allowed to respond:
+      ${configData.restrictions}
+      ---
+      Customer question: ${question}
+    `;
+
+    const GEMINI_API_KEY = "AIzaSyDv7QyjafeOqA9wlSX1GtRkh9rkBEQyVTM";
+    const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
+    // Front-end uses inline_data for the image
+    const bodyPayload = {
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              inline_data: {
+                mime_type: "image/jpeg",
+                data: imageDataURL.split(",")[1] // strip "data:image/jpeg;base64,"
+              }
+            },
+            { text: prompt }
+          ]
+        }
+      ]
+    };
+
+    const response = await fetch(GEMINI_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": GEMINI_API_KEY
+      },
+      body: JSON.stringify(bodyPayload)
+    });
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error(`HTTP ${response.status} — ${errBody}`);
+      return;
+    }
+
+    const apiResponse = await response.json();
+    const text = apiResponse?.candidates?.[0]?.content?.[0]?.text ?? "";
+
+    console.log(apiResponse);
+    console.log(response);
+
+    console.log("Gemini response:", text);
+    return text;
+
+  } catch (err) {
+    console.error("Error analyzing image:", err);
+    return null;
   }
 }
 

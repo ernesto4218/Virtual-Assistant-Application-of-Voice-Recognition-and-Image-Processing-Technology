@@ -11,4 +11,7 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+// assistant
+// CCK9s2MCPLSvxCgiI7J9
+
 export default pool;

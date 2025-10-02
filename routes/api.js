@@ -1,5 +1,6 @@
 import express from 'express';
 import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 
 import { 
   getConfig, 
@@ -33,10 +34,13 @@ import fsp from 'fs/promises'
 import unzipper from 'unzipper';
 import cookieParser from 'cookie-parser';
 import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const uploadDir = path.join(__dirname, '..', '/public/product_image');
+const client = new OpenAI();
 
 // middleware
 const router = express.Router();
@@ -52,33 +56,40 @@ router.post('/ask', async (req, res) => {
     const restrictions = (await getConfig('selected_restrictions')).value;
 
     const products = await getAllProductsBy();
-    const productsString = JSON.stringify(products);
-    console.log(products);
+    const productsWithoutImages = products.map(({ image_path, ...rest }) => rest);
+    const productsString = JSON.stringify(productsWithoutImages);    
+    console.log(productsString);
 
-    const ai = new GoogleGenAI({ apiKey: api });
+    // const ai = new GoogleGenAI({ apiKey: api });
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      systemInstruction: {
-        role: "system",
-        parts: [{
-          text: `${instructions}. Use only items available with categories and prices in Philippine pesos ₱00: ${productsString}. Topics you are not allowed to talk about: ${restrictions}.`
-        }]
-      },
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: `The customer question: ${question}` }]
-        }
-      ],
-      generationConfig: {
-        maxOutputTokens: 100,
-        temperature: 0.1,
-      },
+    // const response = await ai.models.generateContent({
+    //   model: "gemini-2.0-flash",
+    //   systemInstruction: {
+    //     role: "system",
+    //     parts: [{
+    //       text: `${instructions}. Use only items available with categories and prices in Philippine pesos ₱00: ${productsString}. Topics you are not allowed to talk about: ${restrictions}.`
+    //     }]
+    //   },
+    //   contents: [
+    //     {
+    //       role: "user",
+    //       parts: [{ text: `The customer question: ${question}` }]
+    //     }
+    //   ],
+    //   generationConfig: {
+    //     maxOutputTokens: 100,
+    //     temperature: 0.1,
+    //   },
+    // });
+
+    const response = await client.responses.create({
+        model: "gpt-3.5-turbo",
+        input: `${instructions}. Use only items available with categories and prices in Philippine pesos ₱00: ${productsString}. Topics you are not allowed to talk about: ${restrictions}. The customer question: ${question}`
     });
 
+    console.log(response.output_text);
 
-    const text = response?.candidates?.[0]?.content?.parts?.[0]?.text || 'Failed to create response.';
+    const text = response.output_text || 'Failed to create response.';
 
     const matchedProduct = products.find(product => 
       text.toLowerCase().includes(product.name.toLowerCase())
@@ -161,7 +172,8 @@ router.post('/processimage', async (req, res) => {
   const question = req.body.question || 'What is in this image?';
 
   const allproducts = await getAllProducts();
-  const productsString = JSON.stringify(allproducts);
+  const productsWithoutImages = allproducts.map(({ image_path, id, ...rest }) => rest);
+  const productsString = JSON.stringify(productsWithoutImages);
   const restrictions = (await getConfig('selected_restrictions')).value;
   const recognition = (await getConfig('recognition')).value;
 
@@ -195,69 +207,61 @@ router.post('/processimage', async (req, res) => {
   const index = filepath.indexOf(keyword);
   const relativePath = index !== -1 ? filepath.substring(index) : filepath;
 
-  console.log('Image saved to:', filepath);
-
-
   // AI Processing
   const prompt = `
     You are tasked with identifying a single object in an image.
 
     Rules:
-    1. Focus ONLY on the main object in the photo. Ignore the background and anything else.
-    2. Choose ONLY from the items listed under "General Merchandise Items" below.
-    3. Do NOT guess or infer. If the item is not an exact match from the list, respond with:  
-      - Cannot identify the item.
-    5. If the image does not contain a recognizable object, or if the item is unclear or not a real object, respond with the following:
-      "That item doesn't exist in our database."
-      "That item could not be recognized."
-      "Please position the item clearly in the center."
-    6. If some items can be identified and others cannot, list the known items and add:  
-    "I cannot identify the other item(s)."
-    7. If the item is clearly and unambiguously identifiable from the list, give a customer-friendly response that:
-      - Names the item in correct format or spelling.
-      - Mentions where to find it.
-      - States the price in Philippine Pesos (₱00).
-      - Uses a conversational tone.
-      - Ends your message with this exact format command: [product name] (including the brackets and correct item name from the list).
+    - Identify only the main object.
+    - Match only from the product list; do NOT guess or invent.
+    - Use the product name exactly as written in the list (no rewording).
+    - Provide only 1 to 2 sentences with product info (description, price, category, stocks, usage_info).
+    - End your answer with the exact product name in this format: "name":"<product name from list>".
+    - If unclear or not in the list, reply: "Item not in database" or "Cannot recognize."
+    - Never use synonyms, invented words, or alternate phrasing.
+    - Absolutely do NOT answer questions outside the product list or allowed topics.
 
     ---
-    General Merchandise Items:
+    Product List:
     ${productsString}
     ---
 
     ---
-    Topics you are not allowed to respond:
+    Restricted Topics (do not answer about these):
     ${restrictions}
     ---
 
     Customer question: ${question}
-  `;
+    `;
+
+
+
+  console.log('Image saved to:', filepath);
+  console.log('productsString:', productsString);
+  console.log('restrictions:', restrictions);
 
   try {
-    const apiKey = (await getConfig('api_key')).value;
-    const genAI = new GoogleGenAI({ apiKey });
-
     const base64ImageFile = fs.readFileSync(filepath, {
       encoding: "base64",
     });
 
-    const contents = [
-      {
-        inlineData: {
-          mimeType: "image/jpeg",
-          data: base64ImageFile,
-        },
-      },
-      { text: prompt },
-    ];
-
-    const response = await genAI.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: contents,
+    const response = await client.responses.create({
+        model: "gpt-4.1-mini",
+        input: [
+            {
+                role: "user",
+                content: [
+                    { type: "input_text", text: prompt },
+                    {
+                        type: "input_image",
+                        image_url: `data:image/jpeg;base64,${base64ImageFile}`,
+                    },
+                ],
+            },
+        ],
     });
 
-
-    const match = response.text.match(/\[(.+?)\]/i);
+    const match = response.output_text.match(/"name":"([^"]+)"/i);
 
     let matchedProduct = null;
 
@@ -270,6 +274,7 @@ router.post('/processimage', async (req, res) => {
 
     console.log(matchedProduct);
 
+
     await insertQueryImage(
       relativePath,
       matchedProduct?.name || null,
@@ -278,172 +283,11 @@ router.post('/processimage', async (req, res) => {
       question
     );
 
-    res.status(200).json({ success: true, message: response.text, item: matchedProduct });
+    res.status(200).json({ success: true, message: response.output_text, item: matchedProduct });
   } catch (err) {
     console.error("AI Error:", err);
     res.status(500).json({ message: "Error analyzing the image." });
   }
-
-  // if (recognition === 'gemini'){
-  //     // AI Processing
-
-  //     const prompt = `
-  //       You are tasked with identifying a single object in an image.
-
-  //       Rules:
-  //       1. Focus ONLY on the main object in the photo. Ignore the background and anything else.
-  //       2. Choose ONLY from the items listed under "General Merchandise Items" below.
-  //       3. Do NOT guess or infer. If the item is not an exact match from the list, respond with:  
-  //         "The item cannot be identified from the given categories."
-  //       4. If some items can be identified and others cannot, list the known items and add:  
-  //       "I cannot identify the other item(s)."
-  //       5. If the item is clearly and unambiguously identifiable from the list, give a customer-friendly response that:
-  //         - Names the item in correct format or spelling.
-  //         - Mentions where to find it.
-  //         - States the price in Philippine Pesos (PHP).
-  //         - Uses a conversational tone.
-  //         - Include the item name you found the lists in the very end your sentence like this [item name].
-
-  //       ---
-  //       General Merchandise Items:
-  //       ${productsString}
-  //       ---
-
-  //       ---
-  //       Topics you are not allowed to respond:
-  //       ${restrictions}
-  //       ---
-
-  //       Customer question: ${question}
-  //       `;
-
-  //     try {
-  //       const apiKey = (await getConfig('api_key')).value;
-  //       const genAI = new GoogleGenAI({ apiKey });
-
-  //       const base64ImageFile = fs.readFileSync(filepath, {
-  //         encoding: "base64",
-  //       });
-
-  //       const contents = [
-  //         {
-  //           inlineData: {
-  //             mimeType: "image/jpeg",
-  //             data: base64ImageFile,
-  //           },
-  //         },
-  //         { text: prompt },
-  //       ];
-
-  //       const response = await genAI.models.generateContent({
-  //         model: "gemini-2.0-flash",
-  //         contents: contents,
-  //       });
-
-
-  //       const matchedProduct = products.find(product => 
-  //         response.text.toLowerCase().includes(product.name.toLowerCase())
-  //       );
-
-  //       console.log(matchedProduct);
-
-  //       await insertQueryImage(
-  //         relativePath,
-  //         matchedProduct?.name || null,
-  //         matchedProduct?.description || null,
-  //         matchedProduct?.price || null,
-  //         question
-  //       );
-
-  //       console.log(response.text);
-  //       res.json({ success: true, message: response.text });
-
-  //     } catch (err) {
-  //       console.error("AI Error:", err);
-  //       res.status(500).json({ message: "Error analyzing the image." });
-  //     }
-
-  // } else if (recognition === 'ml'){
-  //   // machine learning
-  //   // const prompt = `
-  //   //   You are tasked with identifying a single object being held by a person in an image.
-
-  //   //   Rules:
-  //   //   1. Focus ONLY on the object in their hands. Ignore the background and anything else.
-  //   //   2. Choose ONLY from the items listed under "General Merchandise Items" below.
-  //   //   3. Do NOT guess or infer. If the item is not an exact match from the list, respond with:  
-  //   //     "The item cannot be identified from the given categories."
-  //   //   4. If some items can be identified and others cannot, list the known items and add:  
-  //   //   "I cannot identify the other item(s)."
-  //   //   5. If the item is clearly and unambiguously identifiable from the list, give a customer-friendly response that:
-  //   //     - Names the item in correct format or spelling.
-  //   //     - Mentions where to find it.
-  //   //     - States the price in Philippine Pesos (PHP).
-  //   //     - Uses a conversational tone.
-  //   //     - Include the item name you found the lists in the very end your sentence like this [item name].
-
-  //   //   Strictly follow these rules. No exceptions.
-
-  //   //   ---
-  //   //   General Merchandise Items:
-  //   //   ${productsString}
-  //   //   ---
-
-  //   //   ---
-  //   //   Topics you are not allowed to respond:
-  //   //   ${restrictions}
-  //   //   ---
-
-  //   //   Customer question: ${question}?
-  //   //   `;
-
-  //   // try {
-  //   //   const apiKey = (await getConfig('api_key')).value;
-  //   //   const genAI = new GoogleGenAI({ apiKey });
-
-  //   //   const base64ImageFile = fs.readFileSync(filepath, {
-  //   //     encoding: "base64",
-  //   //   });
-
-  //   //   const contents = [
-  //   //     {
-  //   //       inlineData: {
-  //   //         mimeType: "image/jpeg",
-  //   //         data: base64ImageFile,
-  //   //       },
-  //   //     },
-  //   //     { text: prompt },
-  //   //   ];
-
-  //   //   const response = await genAI.models.generateContent({
-  //   //     model: "gemini-2.0-flash",
-  //   //     contents: contents,
-  //   //   });
-
-
-  //   //   const matchedProduct = products.find(product => 
-  //   //     response.text.toLowerCase().includes(product.name.toLowerCase())
-  //   //   );
-
-  //   //   console.log(matchedProduct);
-
-  //   //   await insertQueryImage(
-  //   //     relativePath,
-  //   //     matchedProduct?.name || null,
-  //   //     matchedProduct?.description || null,
-  //   //     matchedProduct?.price || null,
-  //   //     question
-  //   //   );
-
-  //   //   console.log(response.text);
-  //   //   res.json({ success: true, message: response.text });
-
-  //   // } catch (err) {
-  //   //   console.error("AI Error:", err);
-  //   //   res.status(500).json({ message: "Error analyzing the image." });
-  //   // }
-
-  // }
 });
 
 // add product
@@ -784,3 +628,24 @@ router.post('/change-password', async (req, res) => {
 });
 
 export default router;
+
+
+
+                    // fetch('/api/ask', {
+                    //     method: 'POST',
+                    //     headers: {
+                    //         'Content-Type': 'application/json'
+                    //     },
+                    //     body: JSON.stringify({ question: transcriptSegment })
+                    // })
+                    // .then(res => res.json())
+                    // .then(data => {
+                    //     console.log("Response in", Date.now() - start, "ms:", data);
+                    //     speakWithVoice(data.message, "Google UK English Female");
+                    //     typeCaption(data.message);     
+                    //     isWaitingForResponse = false;
+                    // })
+                    // .catch(err => {
+                    //     console.error('Error:', err);
+                    //     isWaitingForResponse = false;
+                    // });
