@@ -190,6 +190,11 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
                         speakWithVoice(data.message, "Google UK English Female");
                         typeCaption(data.message);     
                         isWaitingForResponse = false;
+                        
+                        if (data.item){
+                          console.log(data.item);
+                          showproduct(data.item);
+                        }
                     })
                     .catch(err => {
                         console.error('Error:', err);

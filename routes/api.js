@@ -56,6 +56,7 @@ router.post('/ask', async (req, res) => {
     const restrictions = (await getConfig('selected_restrictions')).value;
 
     const products = await getAllProductsBy();
+    const allproducts = await getAllProducts();
     const productsWithoutImages = products.map(({ image_path, ...rest }) => rest);
     const productsString = JSON.stringify(productsWithoutImages);    
     console.log(productsString);
@@ -90,19 +91,19 @@ router.post('/ask', async (req, res) => {
     console.log(response.output_text);
 
     const text = response.output_text || 'Failed to create response.';
-
-    const matchedProduct = products.find(product => 
-      text.toLowerCase().includes(product.name.toLowerCase())
-    );
-
-    if (matchedProduct){
-      const record = await insertQuery(question, text, matchedProduct.name, matchedProduct.description, matchedProduct.price);
-
-    } else {
-      const record = await insertQuery(question, text, null, null, null);
+    const match = response.output_text.match(/"name":"([^"]+)"/i);
+    let matchedProduct = null;
+    
+    if (match && match[1]) {
+      const itemName = match[1].toLowerCase();
+      matchedProduct = allproducts.find(product => 
+        product.name.toLowerCase() === itemName
+      );
     }
 
-    res.json({success: true, message: text });
+    console.log(matchedProduct);
+
+    res.json({success: true, message: text, item: matchedProduct });
   } catch (error) {
     console.error('AI error:', error);
     res.status(500).json({ error: 'Failed to generate response' });
