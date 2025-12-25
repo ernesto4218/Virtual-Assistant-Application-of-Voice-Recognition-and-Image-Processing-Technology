@@ -23,6 +23,8 @@ import {
   updateAccount,
   changePass,
   checkauth,
+  UPDATE_PRODUCT_VARIANTS,
+  GET_PRODUCT_BY_ID
  } from '../db/services.js';
 
 import path from 'path';
@@ -35,6 +37,7 @@ import unzipper from 'unzipper';
 import cookieParser from 'cookie-parser';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
+import { GET_PRODUCT_BY } from '../db/queries.js';
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -90,19 +93,25 @@ router.post('/ask', async (req, res) => {
     console.log(response.output_text);
 
     const text = response.output_text || 'Failed to create response.';
+    const match = text.match(/"name"\s*:\s*"([^"]+)"/i);
+    let matchedProduct = null;
+    let fullproductmatch = null;
 
-    const matchedProduct = products.find(product => 
-      text.toLowerCase().includes(product.name.toLowerCase())
-    );
+    if (match && match[1]) {
+      const itemName = match[1].toLowerCase();
 
-    if (matchedProduct){
-      const record = await insertQuery(question, text, matchedProduct.name, matchedProduct.description, matchedProduct.price);
-
-    } else {
-      const record = await insertQuery(question, text, null, null, null);
+      matchedProduct = products.find(
+        product => product.name.toLowerCase() === itemName
+      );
+      
+      fullproductmatch = await GET_PRODUCT_BY_ID(matchedProduct.id);
+      await insertQuery(question, text, fullproductmatch.name, fullproductmatch.description, fullproductmatch.price);
     }
 
-    res.json({success: true, message: text });
+
+    console.log(matchedProduct);
+
+    res.json({success: true, message: text, item: fullproductmatch });
   } catch (error) {
     console.error('AI error:', error);
     res.status(500).json({ error: 'Failed to generate response' });
@@ -626,6 +635,34 @@ router.post('/change-password', async (req, res) => {
     res.status(500).json({ error: 'Failed to save settings' });
   }
 });
+
+router.post('/savevariants', async (req, res) => {
+  try {
+    const { product_id, variants } = req.body;
+
+    if (!product_id || !Array.isArray(variants)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid payload'
+      });
+    }
+
+    await UPDATE_PRODUCT_VARIANTS(variants, product_id);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Variants saved successfully'
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error'
+    });
+  }
+});
+
+
 
 export default router;
 

@@ -189,6 +189,10 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
                         console.log("Response in", Date.now() - start, "ms:", data);
                         speakWithVoice(data.message, "Google UK English Female");
                         typeCaption(data.message);     
+
+                        if (data.item){
+                          showproduct(data.item);
+                        }
                         isWaitingForResponse = false;
                     })
                     .catch(err => {
@@ -828,6 +832,39 @@ function showproduct(data) {
   const allImagePaths = data.image_path.split(', ');
   const firstImagePath = allImagePaths[0].trim();
   image.src = firstImagePath;
+
+  const variants = JSON.parse(data.variants);
+  const container = document.getElementById('productvariantscontainer');
+  const productvaruantparent = document.getElementById('productvaruantparent');
+
+  productvaruantparent.classList.remove('flex');
+  productvaruantparent.classList.add('hidden');
+
+  container.innerHTML = '';
+
+  if (variants.length > 0){
+    variants.forEach(variant => {
+      const variantDiv = document.createElement('div');
+      variantDiv.className = 'flex flex-col border border-gray-200 rounded-md p-2';
+
+      variantDiv.innerHTML = `
+        <div class="flex flex-row gap-2">
+            <p class="text-xs font-normal text-gray-500">Name: </p>
+            <p class="text-xs font-semibold text-black">${variant.name}</p>
+        </div>
+        <div class="flex flex-row gap-2">
+            <p class="text-xs font-normal text-gray-500">Description: </p>
+            <p class="text-xs font-semibold text-black">${variant.description}</p>
+        </div>
+      `;
+
+      container.appendChild(variantDiv);
+    });
+
+    productvaruantparent.classList.add('flex');
+    productvaruantparent.classList.remove('hidden');
+
+  }
 }
 
 

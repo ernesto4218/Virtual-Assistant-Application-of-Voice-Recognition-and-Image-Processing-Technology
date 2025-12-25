@@ -150,8 +150,6 @@ AssistantNavBTN.onclick = function() {
     ProductNavBTN.classList.remove('bg-blue-500', 'text-white');
     ProductNavBTN.classList.add('bg-white', 'text-black');
 
-    mlBTN.classList.remove('bg-blue-500', 'text-white');
-    mlBTN.classList.add('bg-white', 'text-black');
 };
 
 const ProductNavBTN = document.getElementById('ProductNavBTN');

@@ -257,7 +257,6 @@ function loadQueries(data, range) {
   }
 }
 
-
 const dropdownList = document.getElementById('dropdownList');
 dropdownList.addEventListener('click', function (event) {
     if (event.target.tagName === 'A') {
@@ -288,3 +287,92 @@ function triggerClickOnItem(textToClick) {
 
 // Example usage
 handleSelection('Today')
+
+
+// most asked product
+function loadMostAskedProducts(data, range) {
+  const today = new Date();
+  let filteredData = [];
+
+  // Filter by range
+  if (range === "Today") {
+    const todayStr = today.toISOString().split("T")[0];
+    filteredData = data.filter(item => item.created_at.startsWith(todayStr));
+  } else if (range === "Last 7 Days") {
+    const last7 = new Date(today);
+    last7.setDate(today.getDate() - 6);
+    filteredData = data.filter(item => {
+      const itemDate = new Date(item.created_at);
+      return itemDate >= last7 && itemDate <= today;
+    });
+  } else if (range === "Last 30 Days") {
+    const last30 = new Date(today);
+    last30.setDate(today.getDate() - 29);
+    filteredData = data.filter(item => {
+      const itemDate = new Date(item.created_at);
+      return itemDate >= last30 && itemDate <= today;
+    });
+  } else {
+    filteredData = data;
+  }
+
+  // Count questions per product
+  const productCounts = {};
+  filteredData.forEach(item => {
+    const product = item.matched_item_name || "Unknown";
+    if (!productCounts[product]) productCounts[product] = 0;
+    productCounts[product]++;
+  });
+
+  // Prepare chart data (top 10 products)
+  const sortedProducts = Object.entries(productCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
+  const chartData = {
+    x: sortedProducts.map(item => item[0]),
+    y: sortedProducts.map(item => item[1]),
+  };
+
+  const options = {
+    chart: {
+      type: 'bar',
+      height: '300px',
+      toolbar: { show: false },
+    },
+    series: [{
+      name: 'Questions',
+      data: chartData.y
+    }],
+    xaxis: {
+      categories: chartData.x,
+      labels: { rotate: -45 }
+    },
+    dataLabels: { enabled: true },
+    colors: ['#6366f1']
+  };
+
+  if (document.getElementById("most-asked-product-chart") && typeof ApexCharts !== "undefined") {
+    const chart = new ApexCharts(document.getElementById("most-asked-product-chart"), options);
+    chart.render();
+  }
+}
+
+// Dropdown handling
+const productDropdownList = document.getElementById('productDropdownList');
+productDropdownList.addEventListener('click', function(event) {
+  if (event.target.tagName === 'A') {
+    event.preventDefault();
+    const selectedText = event.target.textContent.trim();
+    handleProductSelection(selectedText);
+  }
+});
+
+function handleProductSelection(selection) {
+  document.getElementById('selectedProductDropdownTXT').textContent = selection;
+  document.getElementById('most-asked-product-chart').innerHTML = '';
+  loadMostAskedProducts(activities, selection); // Use your data array
+}
+
+// Initialize
+handleProductSelection('Today');

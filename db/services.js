@@ -85,10 +85,20 @@ export async function getAllProductsImage() {
   return rows;
 }
 
+export async function UPDATE_PRODUCT_VARIANTS(variants, product_id) {
+  const [result] = await db.execute(queries.UPDATE_PRODUCT_VARIANTS, [JSON.stringify(variants), product_id]);
+  return result.affectedRows;
+}
+
 // AI
 export async function getAllProductsBy() {
   const [rows] = await db.execute(queries.GET_PRODUCT_BY);
   return rows;
+}
+
+export async function GET_PRODUCT_BY_ID(id) {
+  const [rows] = await db.execute(queries.GET_PRODUCT_BY_ID, [id]);
+  return rows[0];
 }
 
 export async function insertQuery(question, response, matched_item_name, matched_item_description, price) {

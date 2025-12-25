@@ -95,42 +95,67 @@
                         </article>
                     </div>
 
-                    <div class="flex flex-row gap-2 mt-5">
-<div class="w-full h-fit bg-white rounded-2xl shadow-sm p-2">
-                                <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-black bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" type="button"><span id="selectedDropdownTXT">Filter </span><svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                                    </svg>
-                                </button>
+                    <div class="flex flex-col gap-2 mt-5">
+                        <p class="text-black text-xs">Answered Queries</p>
+                        <div class="w-full h-fit bg-white rounded-2xl shadow-sm p-2">
+                            <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-black bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" type="button"><span id="selectedDropdownTXT">Filter </span><svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                                </svg>
+                            </button>
 
-                                <!-- Dropdown menu -->
-                                <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
-                                    <ul id="dropdownList" class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
-                                        <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Today</a>
-                                        </li>
-                                        <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Last 7 Days</a>
-                                        </li>
-                                        <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Last 30 Days</a>
-                                        </li>
-                                        <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">All Time</a>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div id="area-chart-flexible" class="h-[300px]"></div>
+                            <!-- Dropdown menu -->
+                            <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
+                                <ul id="dropdownList" class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
+                                    <li>
+                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100">Today</a>
+                                    </li>
+                                    <li>
+                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100">Last 7 Days</a>
+                                    </li>
+                                    <li>
+                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100">Last 30 Days</a>
+                                    </li>
+                                    <li>
+                                    <a href="#" class="block px-4 py-2 hover:bg-gray-100">All Time</a>
+                                    </li>
+                                </ul>
                             </div>
+
+                            <div id="area-chart-flexible" class="h-[300px]"></div>
+                        </div>
+
+                        <p class="text-black text-xs mt-5">Identified Products</p>
+                        <div class="w-full h-fit bg-white rounded-2xl shadow-sm p-2">
+                            <button id="productDropdownButton" data-dropdown-toggle="productDropdown" class="text-black bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" type="button">
+                                <span id="selectedProductDropdownTXT">Filter</span>
+                                <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown menu -->
+                            <div id="productDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
+                                <ul id="productDropdownList" class="py-2 text-sm text-gray-700" aria-labelledby="productDropdownButton">
+                                    <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Today</a></li>
+                                    <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Last 7 Days</a></li>
+                                    <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Last 30 Days</a></li>
+                                    <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">All Time</a></li>
+                                </ul>
+                            </div>
+
+                            <div id="most-asked-product-chart" class="h-[300px]"></div>
+                        </div>
+
+
                     </div>
 
-                    <div class="flec flex-col gap-2 mt-10">
+                    <div class="flec flex-col gap-2 mt-10 pb-20">
                         <span class="text-black text-sm font-medium">Recent Activites</span>
                         <div class="mt-5 flex flex-row gap-10">
                             <div class="w-[50%]">
                                 <span class="text-gray-700 text-xs font-medium">Customer Queries</span>
 
-                                <div id="q_parent" class="mt-3 accordion divide-neutral/20 divide-y border-1 border-gray-200 rounded-3xl max-h-[400px] overflow-y-scroll">
+                                <div id="q_parent" class="mt-3 accordion divide-neutral/20 divide-y border-1 bg-white border-gray-200 rounded-3xl max-h-[400px] overflow-y-scroll">
                                     <div class="accordion-item" id="payment-basic">
                                         <button class="accordion-toggle inline-flex items-center gap-x-4 text-start" aria-controls="payment-border-active-collapse" aria-expanded="false" aria-labelledby="payment-border-active-heading">
                                             <span id="q_id" class="text-gray-500 text-sm">#</span>

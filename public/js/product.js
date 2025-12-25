@@ -5,6 +5,29 @@ let products;
 let currentPage = 1;
 const rowsPerPage = 10; 
 let currentSort = { column: null, asc: true };
+const variantshtml = `
+  <div class="variant-item border border-gray-300 rounded-2xl p-4 flex flex-col gap-4">
+    <div class="flex flex-row gap-10">
+      <div class="w-full">
+        <label class="block mb-2 text-xs font-medium text-gray-900">Name</label>
+        <input type="text" class="variant-name bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-2.5" required />
+      </div>
+
+      <div class="w-full">
+        <label class="block mb-2 text-xs font-medium text-gray-900">Description</label>
+        <textarea rows="4" class="variant-description block p-2.5 w-full text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
+      </div>
+    </div>
+
+    <button type="button"
+      class="delete-variant-btn self-end py-2.5 px-5 text-xs font-medium text-red-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">
+      Delete
+    </button>
+  </div>
+`;
+
+
+const variantscontainer = document.getElementById('variantscontainer');
 
 const uploadImgBtn = document.getElementById('uploadImgBtn');
 const fileInput = document.getElementById('productImage');
@@ -170,6 +193,7 @@ function populateProductTable(data = allproducts, page = 1) {
                 <td class="px-6 py-4 w-[100px] overflow-x-auto whitespace-nowrap hide-scrollbar">₱${formattedPrice}</td>
                 <td class="px-6 py-4 w-[100px] flex flex-row gap-2">
                     <button class="text-blue-600 hover:underline edit-btn">Edit</button>
+                    <button class="text-emerald-600 hover:underline variants-btn">Variants</button>
                     <button class="text-red-400 hover:underline delete-btn">Delete</button>
                 </td>
             </tr>`;
@@ -249,15 +273,105 @@ productsTable.addEventListener('click', (event) => {
 
     }
 
-    // if (event.target.classList.contains('classify-btn')) {
-    //     const tr = event.target.closest('tr');
-    //     const productData = JSON.parse(tr.dataset.product);
-    //     console.log('classify clicked:', productData);
-    //     classify_product = productData;
-        
-    //     mlBTN.click();
-    // }
+    if (event.target.classList.contains('variants-btn')) {
+        const tr = event.target.closest('tr');
+        const productData = JSON.parse(tr.dataset.product);
+        const productvariantsformparent = document.getElementById('productvariantsformparent');
+        const selectedproductvarianttxt = document.getElementById('selectedproductvarianttxt');
+        const variant_productid = document.getElementById('variant_productid');
+
+        productvariantsformparent.classList.remove('hidden');
+        productvariantsformparent.classList.add('flex');
+        variantscontainer.innerHTML = '';
+        console.log('product clicked:', productData);
+
+        selectedproductvarianttxt.textContent = productData.name;
+        variant_productid.value = productData.id;
+
+        console.log(variant_productid.value);
+
+        if (productData.variants) {
+            const variants = JSON.parse(productData.variants);
+
+            variants.forEach(variant => {
+                variantscontainer.insertAdjacentHTML('beforeend', variantshtml);
+                const lastVariant =
+                variantscontainer.querySelector('.variant-item:last-child');
+                lastVariant.querySelector('.variant-name').value = variant.name;
+                lastVariant.querySelector('.variant-description').value = variant.description;
+            });
+            }
+
+    }
 });
+
+const addvariantsbtn = document.getElementById('addvariantsbtn');
+addvariantsbtn.onclick = () => {
+  variantscontainer.insertAdjacentHTML('beforeend', variantshtml);
+};
+
+variantscontainer.addEventListener('click', function (e) {
+  if (e.target.classList.contains('delete-variant-btn')) {
+    e.target.closest('.variant-item').remove();
+  }
+});
+
+const savevariantsbtn = document.getElementById('savevariantsbtn');
+savevariantsbtn.onclick = function() {
+    const variants = [];
+    const variantItems = variantscontainer.querySelectorAll('.variant-item');
+
+    variantItems.forEach((item, index) => {
+        const nameInput = item.querySelector('.variant-name');
+        const descInput = item.querySelector('.variant-description');
+
+        const name = nameInput.value.trim();
+        const description = descInput.value.trim();
+
+        if (name === '') {
+        alert(`Variant ${index + 1} name is required`);
+        return;
+        }
+
+        variants.push({
+        name,
+        description
+        });
+    });
+
+    console.log(variants);
+    fetch('/api/savevariants', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ product_id: document.getElementById('variant_productid').value, variants }),
+    })
+
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        showToast('success', data.message);
+
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('error', 'Failed to update product.');
+    });
+    
+};
+
+const close_variantsform = document.getElementById('close_variantsform');
+close_variantsform.onclick = function() {
+    const productvariantsformparent = document.getElementById('productvariantsformparent');
+    productvariantsformparent.classList.remove('flex');
+    productvariantsformparent.classList.add('hidden');
+
+};
+
 
 // sort table
 function sortByColumn(column) {
