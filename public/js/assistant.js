@@ -829,9 +829,15 @@ function showproduct(data) {
   description.textContent = data.description;
   price.textContent = "₱" + data.price;
 
-  const allImagePaths = data.image_path.split(', ');
-  const firstImagePath = allImagePaths[0].trim();
-  image.src = firstImagePath;
+  let firstImagePath = '';
+
+  if (typeof data.image_path === 'string' && data.image_path.trim() !== '') {
+    const allImagePaths = data.image_path.split(',');
+    firstImagePath = allImagePaths[0].trim();
+  }
+
+  image.src = firstImagePath || 'https://placehold.co/600x400';
+
 
   const variants = JSON.parse(data.variants);
   const container = document.getElementById('productvariantscontainer');
@@ -842,19 +848,20 @@ function showproduct(data) {
 
   container.innerHTML = '';
 
-  if (variants.length > 0){
+  if (Array.isArray(variants) && variants.length > 0) {
+    console.log(variants);
     variants.forEach(variant => {
       const variantDiv = document.createElement('div');
       variantDiv.className = 'flex flex-col border border-gray-200 rounded-md p-2';
 
       variantDiv.innerHTML = `
         <div class="flex flex-row gap-2">
-            <p class="text-xs font-normal text-gray-500">Name: </p>
-            <p class="text-xs font-semibold text-black">${variant.name}</p>
+          <p class="text-xs font-normal text-gray-500">Name:</p>
+          <p class="text-xs font-semibold text-black">${variant.name}</p>
         </div>
         <div class="flex flex-row gap-2">
-            <p class="text-xs font-normal text-gray-500">Description: </p>
-            <p class="text-xs font-semibold text-black">${variant.description}</p>
+          <p class="text-xs font-normal text-gray-500">Description:</p>
+          <p class="text-xs font-semibold text-black">${variant.description}</p>
         </div>
       `;
 
@@ -863,8 +870,11 @@ function showproduct(data) {
 
     productvaruantparent.classList.add('flex');
     productvaruantparent.classList.remove('hidden');
-
+  } else {
+    productvaruantparent.classList.add('hidden');
+    productvaruantparent.classList.remove('flex');
   }
+
 }
 
 
